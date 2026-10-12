@@ -2972,8 +2972,8 @@ img {
 
 /* @settings
 
-name: Retroma Theme
-id: retroma-obsidian-theme
+name: Vintage Computer
+id: vintage-computer
 settings:
     -
         id: theme-color-scheme-selection
@@ -3437,7 +3437,7 @@ settings:
     -
         id: description
         title: 
-        description: "Retroma GitHub Repo: https://github.com/emarpiee/Retroma<br>Retroma Developer: https://github.com/emarpiee<br><br>☕️ **BUY ME A COFEE**: https://buymeacoffee.com/emarpiee<br>Ko-Fi: https://ko-fi.com/emarpiee <br>PayPal: https://paypal.me/emarpiee"
+        description: "Vintage Computer GitHub Repo: https://github.com/pakcli/Vintage-Computer<br>Maintained by: https://github.com/pakcli<br>Original upstream theme: https://github.com/emarpiee/Retroma"
         type: info-text
         markdown: true
 */
