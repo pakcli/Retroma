@@ -4,6 +4,10 @@ A tactile, retro-computing inspired theme for [Obsidian](https://obsidian.md).
 
 **Vintage Computer** brings back the soul of classic computing, retro workstations, and early graphical user interfaces into modern note-taking. Built with tactile borders, mechanical-era typography options, and an intelligent adaptive multi-row toolbar for fluid workspace productivity.
 
+<p align="center">
+  <img src="assets/screenshots/screenshot.png" alt="Vintage Computer Theme Preview" width="100%">
+</p>
+
 ---
 
 ## Highlights
@@ -18,8 +22,13 @@ A tactile, retro-computing inspired theme for [Obsidian](https://obsidian.md).
 
 ## Installation
 
+### Via Obsidian Community Themes (Recommended)
+1. In Obsidian, open **Settings > Appearance > Themes**.
+2. Click **Manage** and search for `Vintage Computer`.
+3. Click **Install and use**.
+
 ### Manual Installation
-1. Download `manifest.json` and `theme.css`.
+1. Download `manifest.json` and `theme.css` from the [Latest Release](https://github.com/pakcli/Vintage-Computer/releases/latest).
 2. In your Obsidian vault, navigate to `.obsidian/themes/`.
 3. Create a new folder named `Vintage Computer`.
 4. Place `manifest.json` and `theme.css` inside that folder.
