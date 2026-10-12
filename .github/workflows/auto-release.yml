@@ -46,20 +46,35 @@ jobs:
           echo "Computed tag: $TAG"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Create release and upload assets
-        env:
-          ASSET1: manifest.json
-          ASSET2: theme.css
-        run: |
-          TAG="${{ steps.vars.outputs.tag }}"
-          echo "Creating release $TAG"
-          gh release create "$TAG" "$ASSET1" "$ASSET2" \
-            --title "Release $TAG" \
-            --notes "Automated release: $TAG" \
-            --target "${{ github.sha }}" \
-            --repo "${{ github.repository }}"
-
-      - name: Show created release
-        run: gh release view "${{ steps.vars.outputs.tag }}" --repo "${{ github.repository }}" || true
+      - name: Create GitHub release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          release_name: Release ${{ steps.vars.outputs.tag }}
+          body: Automated release: ${{ steps.vars.outputs.tag }}
+          draft: false
+          prerelease: false
+          target_commitish: ${{ github.sha }}
+
+      - name: Upload manifest.json
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: manifest.json
+          asset_name: manifest.json
+          asset_content_type: application/json
+
+      - name: Upload theme.css
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: theme.css
+          asset_name: theme.css
+          asset_content_type: text/css
