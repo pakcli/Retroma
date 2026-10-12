@@ -7,11 +7,6 @@ A tactile, retro-computing inspired theme for [Obsidian](https://obsidian.md).
 <p align="center">
   <img src="assets/screenshots/screenshot.png" alt="Vintage Computer Theme Preview" width="100%">
 </p>
-
-<p align="center">
-  <img src="assets/screenshots/screenshot.png" alt="Vintage Computer Theme Preview" width="100%">
-</p>
-
 ---
 
 ## ✨ Highlights
