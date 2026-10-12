@@ -12,9 +12,9 @@ permissions:
 env:
   BASE_MAJOR: "1"
   BASE_MINOR: "0"
-  MANIFEST_PATH: "manifest.json"   # change if manifest.json is in a subfolder
-  ASSET1_PATH: "manifest.json"     # file to attach as asset (can be same as MANIFEST_PATH)
-  ASSET2_PATH: "theme.css"         # change if theme.css is elsewhere
+  MANIFEST_PATH: "manifest.json"
+  ASSET1_PATH: "manifest.json"
+  ASSET2_PATH: "theme.css"
 
 jobs:
   release:
@@ -34,6 +34,10 @@ jobs:
 
       - name: Determine next 1.0.X tag
         id: vars
+        shell: bash
+        env:
+          BASE_MAJOR: "1"
+          BASE_MINOR: "0"
         run: |
           set -eo pipefail
           git fetch --tags --quiet
@@ -57,6 +61,7 @@ jobs:
 
       - name: Bump manifest.json version and push
         id: bump
+        shell: bash
         env:
           MANIFEST: ${{ env.MANIFEST_PATH }}
           TAG: ${{ steps.vars.outputs.tag }}
@@ -70,7 +75,6 @@ jobs:
             exit 1
           fi
 
-          # Ensure jq is available
           if ! command -v jq >/dev/null 2>&1; then
             sudo apt-get update -y
             sudo apt-get install -y jq
@@ -79,12 +83,10 @@ jobs:
           OLD_VERSION=$(jq -r '.version // empty' "$MANIFEST" || true)
           echo "Old manifest version: ${OLD_VERSION:-<none>}"
 
-          # Update version field (creates a new file safely)
           tmp="$(mktemp)"
           jq --arg v "$TAG" '.version = $v' "$MANIFEST" > "$tmp"
           mv "$tmp" "$MANIFEST"
 
-          # Commit & push if changed
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "$MANIFEST"
@@ -94,13 +96,11 @@ jobs:
           else
             COMMIT_MSG="chore(release): bump manifest to $TAG [skip ci]"
             git commit -m "$COMMIT_MSG"
-            # push back to the branch that triggered the workflow
             BRANCH="${GITHUB_REF#refs/heads/}"
             echo "Pushing updated manifest to ${BRANCH}"
             git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" "HEAD:${BRANCH}"
           fi
 
-          # expose the commit SHA after potential push
           COMMIT_SHA=$(git rev-parse HEAD)
           echo "commit_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
 
@@ -111,8 +111,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
-          release_name: Release ${{ steps.vars.outputs.tag }}
-          body: Automated release: ${{ steps.vars.outputs.tag }}
+          release_name: "Release ${{ steps.vars.outputs.tag }}"
+          body: |
+            Automated release: ${{ steps.vars.outputs.tag }}
           draft: false
           prerelease: false
           target_commitish: ${{ steps.bump.outputs.commit_sha }}
