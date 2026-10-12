@@ -3,12 +3,8 @@ name: Auto release on push (1.0.X patch)
 on:
   push:
     branches:
-      - main
-    # Optionally limit to commits that touch your theme files:
-    # paths:
-    #   - 'manifest.json'
-    #   - 'theme.css'
-    #   - 'path/to/your/theme/**'
+      - main-pakcli
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -49,7 +45,6 @@ jobs:
         run: |
           TAG="${{ steps.vars.outputs.tag }}"
           echo "Creating release $TAG"
-          # create release and upload the two asset files (will create tag)
           gh release create "$TAG" "$ASSET1" "$ASSET2" \
             --title "Release $TAG" \
             --notes "Automated release: $TAG" \
