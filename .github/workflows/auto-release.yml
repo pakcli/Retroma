@@ -1,0 +1,62 @@
+name: Auto release on push (1.0.X patch)
+
+on:
+  push:
+    branches:
+      - main
+    # Optionally limit to commits that touch your theme files:
+    # paths:
+    #   - 'manifest.json'
+    #   - 'theme.css'
+    #   - 'path/to/your/theme/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository (full)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine next 1.0.X tag
+        id: vars
+        env:
+          BASE_MAJOR: 1
+          BASE_MINOR: 0
+        run: |
+          git fetch --tags --quiet
+          # find tags like 1.0.X or v1.0.X, strip leading v, get highest patch number
+          latest=$(git tag --list 'v'"$BASE_MAJOR"."$BASE_MINOR".* ' '"$BASE_MAJOR"."$BASE_MINOR".*' | sed 's/^v//' \
+            | awk -F. -v maj="$BASE_MAJOR" -v min="$BASE_MINOR" '$1==maj && $2==min {print $3}' \
+            | sort -n | tail -n1)
+          if [ -z "$latest" ]; then
+            next=0
+          else
+            next=$((latest+1))
+          fi
+          TAG="$BASE_MAJOR.$BASE_MINOR.$next"
+          echo "Computed tag: $TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Create release and upload assets
+        env:
+          ASSET1: manifest.json
+          ASSET2: theme.css
+        run: |
+          TAG="${{ steps.vars.outputs.tag }}"
+          echo "Creating release $TAG"
+          # create release and upload the two asset files (will create tag)
+          gh release create "$TAG" "$ASSET1" "$ASSET2" \
+            --title "Release $TAG" \
+            --notes "Automated release: $TAG" \
+            --target "${{ github.sha }}" \
+            --repo "${{ github.repository }}"
+
+      - name: Show created release
+        run: gh release view "${{ steps.vars.outputs.tag }}" --repo "${{ github.repository }}" || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
