@@ -24,19 +24,27 @@ jobs:
           BASE_MAJOR: 1
           BASE_MINOR: 0
         run: |
+          set -eo pipefail
           git fetch --tags --quiet
-          # find tags like 1.0.X or v1.0.X, strip leading v, get highest patch number
-          latest=$(git tag --list 'v'"$BASE_MAJOR"."$BASE_MINOR".* ' '"$BASE_MAJOR"."$BASE_MINOR".*' | sed 's/^v//' \
+
+          # list tags matching vMAJOR.MINOR.* or MAJOR.MINOR.*, strip leading 'v'
+          tags=$(git tag --list "v${BASE_MAJOR}.${BASE_MINOR}.*" "${BASE_MAJOR}.${BASE_MINOR}.*" || true)
+          tags=$(echo "$tags" | sed 's/^v//' | tr -d '\r')
+
+          # extract patch numbers for matching MAJOR.MINOR and pick the max
+          latest=$(printf "%s\n" "$tags" \
             | awk -F. -v maj="$BASE_MAJOR" -v min="$BASE_MINOR" '$1==maj && $2==min {print $3}' \
-            | sort -n | tail -n1)
+            | sort -n | tail -n1 || true)
+
           if [ -z "$latest" ]; then
             next=0
           else
-            next=$((latest+1))
+            next=$((latest + 1))
           fi
-          TAG="$BASE_MAJOR.$BASE_MINOR.$next"
+
+          TAG="${BASE_MAJOR}.${BASE_MINOR}.${next}"
           echo "Computed tag: $TAG"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Create release and upload assets
         env:
