@@ -1,4 +1,4 @@
-name: Auto release on push (1.0.X patch)
+name: Auto release + bump manifest (1.0.X)
 
 on:
   push:
@@ -9,6 +9,13 @@ on:
 permissions:
   contents: write
 
+env:
+  BASE_MAJOR: "1"
+  BASE_MINOR: "0"
+  MANIFEST_PATH: "manifest.json"   # change if manifest.json is in a subfolder
+  ASSET1_PATH: "manifest.json"     # file to attach as asset (can be same as MANIFEST_PATH)
+  ASSET2_PATH: "theme.css"         # change if theme.css is elsewhere
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -18,20 +25,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Exit when run by actions bot (avoid loop)
+        run: |
+          if [ "${GITHUB_ACTOR}" = "github-actions[bot]" ] || [ "${GITHUB_ACTOR}" = "github-actions" ]; then
+            echo "Run triggered by GitHub Actions bot; exiting to avoid loop."
+            exit 0
+          fi
+
       - name: Determine next 1.0.X tag
         id: vars
-        env:
-          BASE_MAJOR: 1
-          BASE_MINOR: 0
         run: |
           set -eo pipefail
           git fetch --tags --quiet
 
-          # list tags matching vMAJOR.MINOR.* or MAJOR.MINOR.*, strip leading 'v'
           tags=$(git tag --list "v${BASE_MAJOR}.${BASE_MINOR}.*" "${BASE_MAJOR}.${BASE_MINOR}.*" || true)
-          tags=$(echo "$tags" | sed 's/^v//' | tr -d '\r')
+          tags=$(printf "%s\n" "$tags" | sed 's/^v//' | tr -d '\r')
 
-          # extract patch numbers for matching MAJOR.MINOR and pick the max
           latest=$(printf "%s\n" "$tags" \
             | awk -F. -v maj="$BASE_MAJOR" -v min="$BASE_MINOR" '$1==maj && $2==min {print $3}' \
             | sort -n | tail -n1 || true)
@@ -46,6 +55,55 @@ jobs:
           echo "Computed tag: $TAG"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
+      - name: Bump manifest.json version and push
+        id: bump
+        env:
+          MANIFEST: ${{ env.MANIFEST_PATH }}
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          set -eo pipefail
+          MANIFEST="${MANIFEST}"
+          TAG="${TAG}"
+
+          if [ ! -f "$MANIFEST" ]; then
+            echo "Manifest not found at $MANIFEST"
+            exit 1
+          fi
+
+          # Ensure jq is available
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+          fi
+
+          OLD_VERSION=$(jq -r '.version // empty' "$MANIFEST" || true)
+          echo "Old manifest version: ${OLD_VERSION:-<none>}"
+
+          # Update version field (creates a new file safely)
+          tmp="$(mktemp)"
+          jq --arg v "$TAG" '.version = $v' "$MANIFEST" > "$tmp"
+          mv "$tmp" "$MANIFEST"
+
+          # Commit & push if changed
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$MANIFEST"
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit for $MANIFEST"
+          else
+            COMMIT_MSG="chore(release): bump manifest to $TAG [skip ci]"
+            git commit -m "$COMMIT_MSG"
+            # push back to the branch that triggered the workflow
+            BRANCH="${GITHUB_REF#refs/heads/}"
+            echo "Pushing updated manifest to ${BRANCH}"
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" "HEAD:${BRANCH}"
+          fi
+
+          # expose the commit SHA after potential push
+          COMMIT_SHA=$(git rev-parse HEAD)
+          echo "commit_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub release
         id: create_release
         uses: actions/create-release@v1
@@ -57,24 +115,24 @@ jobs:
           body: Automated release: ${{ steps.vars.outputs.tag }}
           draft: false
           prerelease: false
-          target_commitish: ${{ github.sha }}
+          target_commitish: ${{ steps.bump.outputs.commit_sha }}
 
-      - name: Upload manifest.json
+      - name: Upload manifest.json asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: manifest.json
-          asset_name: manifest.json
+          asset_path: ${{ env.ASSET1_PATH }}
+          asset_name: ${{ env.ASSET1_PATH }}
           asset_content_type: application/json
 
-      - name: Upload theme.css
+      - name: Upload theme.css asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: theme.css
-          asset_name: theme.css
+          asset_path: ${{ env.ASSET2_PATH }}
+          asset_name: ${{ env.ASSET2_PATH }}
           asset_content_type: text/css
