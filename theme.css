@@ -68,7 +68,7 @@ body {
   /* Hue is normalized to the 0-360 degree angle range, any rotation value greater than 360 wraps around (e.g., 370 becomes 10) */
   --rotation-1: 20;
   --rotation-2: 0;
-  --accent-1: oklch(from var(--base-accent) l c calc(h  + var(--rotation-2)));
+  --accent-1: oklch(from var(--base-accent) l c calc(h + var(--rotation-2)));
   --accent-2: oklch(from var(--base-accent) l c calc(h + var(--rotation-1)));
 
   /* Color Palette */
@@ -247,7 +247,6 @@ body {
   --metadata-property-background-hover: var(--background-paper);
   --metadata-property-radius: var(--window-border-radius);
   --metadata-property-box-shadow-hover: 0 0 0 1px var(--background-tertiary);
-  --metadata-property-radius: var(--window-border-radius);
   --metadata-property-radius-hover: var(--window-border-radius);
   --metadata-property-radius-focus: var(--window-border-radius);
 
@@ -293,7 +292,7 @@ body {
 
   --settings-background: var(--background-paper);
   --setting-items-background: var(--background-primary);
-  --file-header-background-focused: var(--background-secondary);
+  --file-header-background-focused: var(--background-primary);
 }
 
 .theme-light {
@@ -939,7 +938,7 @@ body:not(.is-mobile):not(.is-phone) .workspace-leaf {
   max-width: 100%;
   margin-left: auto;
   margin-right: auto;
-  margin-block: var(--size-4-2);
+  margin-block: calc(var(--size-4-2) * 0.5);
   padding: 6px;
   background-color: var(--background-primary-alt);
   border: var(--border-groove);
@@ -1002,8 +1001,12 @@ blockquote {
   overflow: auto;
   }
 
+:is(.theme-light, .theme-dark) .workspace-leaf.mod-active .view-header,
+:is(.theme-light, .theme-dark) .is-focused .workspace-leaf.mod-active .view-header,
+:is(.theme-light, .theme-dark).is-mobile .workspace-leaf.mod-active .view-header,
+.workspace-leaf.mod-active .view-header,
 .is-focused .workspace-leaf.mod-active .view-header {
-  background-color: var(--background-secondary);
+  background-color: var(--background-primary);
 }
 
 .view-header-title-container {
@@ -1025,7 +1028,6 @@ blockquote {
   min-height: 48px;
   margin: 4px;
   width: unset;
-  background-color: var(--background-secondary);
   display: flex;
   align-items: center;
 }
@@ -1396,7 +1398,7 @@ tr:last-child td:last-child {
   height: var(--icon-s);
   width: var(--icon-s);
   mask-repeat: no-repeat;
-  background-color: currentColor;
+  background-color: currentcolor;
 }
 
 .nav-folder-title .nav-folder-title-content::before {
@@ -2451,50 +2453,46 @@ tr:last-child td:last-child {
     max-height: calc(100% - 64px);
   }
 
-  /* Push top tab action buttons (tab-list, sidebar toggle, new tab) flush into the top-right corner,
-     reclaiming the space where desktop minimize/maximize/close buttons were */
-  .workspace-tab-header-container {
+  /* Push top tab action buttons on mobile screens <= 600px */
+  :is(.is-mobile, .is-phone) .workspace-tab-header-container {
     padding-right: 0px;
     margin-right: 0px;
     width: 100%;
   }
 
-  .workspace-tab-header-container-inner {
+  :is(.is-mobile, .is-phone) .workspace-tab-header-container-inner {
     flex: 1 1 auto;
     min-width: 0;
     margin-right: 0;
     padding-right: 0;
   }
 
-  .workspace-tab-header-spacer {
+  :is(.is-mobile, .is-phone) .workspace-tab-header-spacer {
     display: none;
     width: 0px;
   }
 
-  .workspace-tab-header-tab-list {
+  :is(.is-mobile, .is-phone) .workspace-tab-header-tab-list {
     margin-left: auto;
   }
 
-  .workspace-tab-header-new-tab,
-  .sidebar-toggle-button.mod-right {
+  :is(.is-mobile, .is-phone) .workspace-tab-header-new-tab,
+  :is(.is-mobile, .is-phone) .sidebar-toggle-button.mod-right {
     margin-right: 0px;
     margin-left: 2px;
   }
 
-  /* Clear electron window control frame reservation */
-  body.is-mobile,
-  body.is-phone,
-  body.is-tablet,
-  body {
+  /* Clear electron window control frame reservation on mobile devices only */
+  body.is-mobile:not(.mod-windows),
+  body.is-phone {
     --header-right-space: 0px;
     --frame-right-space: 0px;
     --titlebar-right-space: 0px;
     --safe-area-inset-right: 0px;
   }
 
-  .mod-windows .titlebar-button-container.mod-right,
-  .titlebar-button-container.mod-right,
-  .titlebar-button-container {
+  body.is-mobile:not(.mod-windows) .titlebar-button-container,
+  body.is-phone .titlebar-button-container {
     display: none;
     width: 0px;
     max-width: 0px;
@@ -2513,7 +2511,7 @@ tr:last-child td:last-child {
     right: 0;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: var(--size-4-2);
+    margin-bottom: calc(var(--size-4-2) * 0.5);
     z-index: 1;
   }
 
@@ -2557,33 +2555,27 @@ tr:last-child td:last-child {
     right: auto;
     margin-left: auto;
     margin-right: auto;
-    margin-top: var(--size-4-2);
-    margin-bottom: var(--size-4-2);
+    margin-top: calc(var(--size-4-2) * 0.5);
+    margin-bottom: calc(var(--size-4-2) * 0.5);
   }
 }
 
 /* Tablet & General Mobile (including landscape & tablet viewports) - Push top-right toggle & dropdown flush to the edge */
-body.is-mobile,
+body.is-mobile:not(.mod-windows),
 body.is-phone,
-body.is-tablet,
-.is-mobile,
-.is-phone,
-.is-tablet {
+.is-mobile:not(.mod-windows),
+.is-phone {
   --header-right-space: 0px;
   --frame-right-space: 0px;
   --titlebar-right-space: 0px;
   --safe-area-inset-right: 0px;
 }
 
-body.is-mobile .titlebar-button-container,
-body.is-mobile .titlebar-button-container.mod-right,
+body.is-mobile:not(.mod-windows) .titlebar-button-container,
+body.is-mobile:not(.mod-windows) .titlebar-button-container.mod-right,
 body.is-phone .titlebar-button-container,
-body.is-tablet .titlebar-button-container,
-.is-mobile .titlebar-button-container,
-.is-phone .titlebar-button-container,
-.is-tablet .titlebar-button-container,
-.mod-windows.is-mobile .titlebar-button-container.mod-right,
-.mod-windows.is-tablet .titlebar-button-container.mod-right {
+.is-mobile:not(.mod-windows) .titlebar-button-container,
+.is-phone .titlebar-button-container {
   display: none;
   width: 0px;
   max-width: 0px;
@@ -2642,53 +2634,6 @@ body.is-tablet .sidebar-toggle-button.mod-right,
 .is-tablet .sidebar-toggle-button.mod-right {
   margin-right: 0px;
   margin-left: 2px;
-}
-
-@media (max-width: 1024px) {
-  body {
-    --header-right-space: 0px;
-    --frame-right-space: 0px;
-    --titlebar-right-space: 0px;
-    --safe-area-inset-right: 0px;
-  }
-
-  :is(.theme-light, .theme-dark) .titlebar-button-container,
-  :is(.theme-light, .theme-dark) .titlebar-button-container.mod-right,
-  :is(.theme-light, .theme-dark).mod-windows .titlebar-button-container.mod-right {
-    display: none;
-    width: 0px;
-    max-width: 0px;
-    min-width: 0px;
-    padding: 0;
-    margin: 0;
-  }
-
-  .workspace-tab-header-container {
-    padding-right: 0px;
-    margin-right: 0px;
-    width: 100%;
-  }
-
-  .workspace-tab-header-container-inner {
-    flex: 1 1 auto;
-    min-width: 0;
-    margin-right: 0;
-    padding-right: 0;
-  }
-
-  .workspace-tab-header-spacer {
-    display: none;
-    width: 0px;
-  }
-
-  .workspace-tab-header-tab-list {
-    margin-left: auto;
-  }
-
-  .sidebar-toggle-button.mod-right {
-    margin-right: 0px;
-    margin-left: 2px;
-  }
 }
 
 /* Mobile Editing / Keyboard Toolbar */
@@ -3058,6 +3003,25 @@ img {
   content: none;
   width: 0;
   height: 0;
+}
+
+/* 4. Ensure desktop Windows titlebar controls (minimize, maximize/resize, close) are visible in the top-right corner */
+:is(.theme-light, .theme-dark).mod-windows .titlebar-button-container,
+:is(.theme-light, .theme-dark).mod-windows .titlebar-button-container.mod-right {
+  display: flex;
+}
+
+/* 5. Nav buttons container top and bottom margins shrunk by 50% */
+:is(.theme-light, .theme-dark) .nav-buttons-container,
+:is(.theme-light, .theme-dark) .workspace-drawer .nav-buttons-container {
+  margin-block: calc(var(--size-4-2) * 0.5);
+}
+
+/* 6. Active workspace leaf header fill color matches note content below */
+:is(.theme-light, .theme-dark) .workspace-leaf.mod-active .view-header,
+:is(.theme-light, .theme-dark) .is-focused .workspace-leaf.mod-active .view-header,
+:is(.theme-light, .theme-dark).is-mobile .workspace-leaf.mod-active .view-header {
+  background-color: var(--background-primary);
 }
 
 /* @settings
