@@ -509,6 +509,7 @@ body {
 :is(.theme-light, .theme-dark) .clickable-icon,
 :is(.theme-light, .theme-dark) .metadata-add-button,
 :is(.theme-light, .theme-dark) .workspace-tab-header,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable,
 :is(.theme-light, .theme-dark) .workspace-ribbon .clickable-icon,
 :is(.theme-light, .theme-dark) .side-dock-ribbon-action,
 :is(.theme-light, .theme-dark) .setting-item-control .clickable-icon,
@@ -525,6 +526,7 @@ body {
 :is(.theme-light, .theme-dark) .metadata-add-button,
 :is(.theme-light, .theme-dark) .vertical-tab-nav-item:not(.settings-search-input),
 :is(.theme-light, .theme-dark) .workspace-tab-header,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable,
 :is(.theme-light, .theme-dark) .workspace-ribbon .clickable-icon,
 :is(.theme-light, .theme-dark) .side-dock-ribbon-action,
 :is(.theme-light, .theme-dark) .workspace-drawer-tab-select .workspace-tab-header {
@@ -541,6 +543,7 @@ body {
 :is(.theme-light, .theme-dark) .metadata-add-button:hover,
 :is(.theme-light, .theme-dark) .vertical-tab-nav-item:not(.settings-search-input):hover,
 :is(.theme-light, .theme-dark) .workspace-tab-header:hover,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable:hover,
 :is(.theme-light, .theme-dark) .workspace-ribbon .clickable-icon:hover,
 :is(.theme-light, .theme-dark) .sidebar-toggle-button:hover {
   background-color: var(--button-hover);
@@ -553,6 +556,9 @@ body {
 :is(.theme-light, .theme-dark) .metadata-add-button:active,
 :is(.theme-light, .theme-dark) .vertical-tab-nav-item.is-active,
 :is(.theme-light, .theme-dark) .workspace-tab-header.is-active,
+:is(.theme-light, .theme-dark) .workspace-tab-header.mod-active,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable.is-active,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable.is-active.mod-active,
 :is(.theme-light, .theme-dark) .sidebar-toggle-button.is-active {
   background-color: var(--button-active);
   box-shadow: var(--box-shadow-active);
@@ -565,6 +571,8 @@ body {
 :is(.theme-light, .theme-dark) .workspace-tab-header::after,
 :is(.theme-light, .theme-dark) .workspace-tab-header.is-active::before,
 :is(.theme-light, .theme-dark) .workspace-tab-header.is-active::after,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable::before,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable::after,
 :is(.theme-light, .theme-dark) .workspace-tab-header-inner::before,
 :is(.theme-light, .theme-dark) .workspace-tab-header-inner::after,
 :is(.theme-light, .theme-dark) .workspace .mod-root .workspace-tab-header-inner::after {
@@ -583,7 +591,8 @@ button.mod-warning {
 :is(.theme-dark) .clickable-icon,
 :is(.theme-dark) .text-icon-button,
 :is(.theme-dark) .metadata-add-button,
-:is(.theme-dark) .workspace-tab-header {
+:is(.theme-dark) .workspace-tab-header,
+:is(.theme-dark) .workspace-tab-header.tappable {
   color: var(--text-normal);
 }
 
@@ -1001,12 +1010,21 @@ blockquote {
   overflow: auto;
   }
 
+:is(.theme-light, .theme-dark) .view-header,
+:is(.theme-light, .theme-dark) .view-header.view-header-always-show,
+:is(.theme-light, .theme-dark) .workspace-leaf .view-header,
 :is(.theme-light, .theme-dark) .workspace-leaf.mod-active .view-header,
+:is(.theme-light, .theme-dark) .workspace-leaf.mod-active .view-header.view-header-always-show,
 :is(.theme-light, .theme-dark) .is-focused .workspace-leaf.mod-active .view-header,
 :is(.theme-light, .theme-dark).is-mobile .workspace-leaf.mod-active .view-header,
+.view-header,
+.view-header.view-header-always-show,
+.workspace-leaf .view-header,
 .workspace-leaf.mod-active .view-header,
 .is-focused .workspace-leaf.mod-active .view-header {
-  background-color: var(--background-primary);
+  background-color: var(--background-secondary);
+  border: var(--border-groove);
+  border-radius: var(--window-border-radius);
 }
 
 .view-header-title-container {
@@ -2964,9 +2982,13 @@ img {
   justify-content: center;
 }
 
-/* 2. Fix [Q], [bookmark], [folder] to be full 3D vintage buttons */
+/* 2. Fix all tabs (left split, right split, drawer, root) to be full 3D vintage buttons */
+:is(.theme-light, .theme-dark) .workspace-tab-header,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable,
 :is(.theme-light, .theme-dark) .workspace-drawer-tab-select .workspace-tab-header,
-:is(.theme-light, .theme-dark) .workspace-split.mod-left-split .workspace-tab-header {
+:is(.theme-light, .theme-dark) .workspace-split .workspace-tab-header,
+:is(.theme-light, .theme-dark) .workspace-split.mod-left-split .workspace-tab-header,
+:is(.theme-light, .theme-dark) .workspace-split.mod-right-split .workspace-tab-header {
   background-color: var(--button-normal);
   border: var(--border-width) solid var(--outline-color);
   box-shadow: var(--box-shadow);
@@ -2974,23 +2996,47 @@ img {
   margin: 2px;
   cursor: pointer;
   opacity: 1;
+  color: var(--text-normal);
 }
 
+:is(.theme-light, .theme-dark) .workspace-tab-header:hover,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable:hover,
 :is(.theme-light, .theme-dark) .workspace-drawer-tab-select .workspace-tab-header:hover,
-:is(.theme-light, .theme-dark) .workspace-split.mod-left-split .workspace-tab-header:hover {
+:is(.theme-light, .theme-dark) .workspace-split .workspace-tab-header:hover,
+:is(.theme-light, .theme-dark) .workspace-split.mod-left-split .workspace-tab-header:hover,
+:is(.theme-light, .theme-dark) .workspace-split.mod-right-split .workspace-tab-header:hover {
   background-color: var(--button-hover);
+  opacity: 1;
 }
 
+:is(.theme-light, .theme-dark) .workspace-tab-header.is-active,
+:is(.theme-light, .theme-dark) .workspace-tab-header.mod-active,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable.is-active,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable.is-active.mod-active,
 :is(.theme-light, .theme-dark) .workspace-drawer-tab-select .workspace-tab-header.is-active,
-:is(.theme-light, .theme-dark) .workspace-split.mod-left-split .workspace-tab-header.is-active {
+:is(.theme-light, .theme-dark) .workspace-split .workspace-tab-header.is-active,
+:is(.theme-light, .theme-dark) .workspace-split.mod-left-split .workspace-tab-header.is-active,
+:is(.theme-light, .theme-dark) .workspace-split.mod-right-split .workspace-tab-header.is-active {
   background-color: var(--button-active);
   box-shadow: var(--box-shadow-active);
   border: var(--border-width) solid var(--outline-color);
+  font-weight: var(--font-bold);
+  opacity: 1;
+}
+
+/* Ensure tab icons and titles have full opacity and proper contrast */
+:is(.theme-light, .theme-dark) .workspace-tab-header .workspace-tab-header-inner-title,
+:is(.theme-light, .theme-dark) .workspace-tab-header .workspace-tab-header-inner-icon,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable .workspace-tab-header-inner-title,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable .workspace-tab-header-inner-icon {
+  opacity: 1;
+  color: var(--text-normal);
 }
 
 /* 3. Hide any new-tab button in the sidebar */
 .workspace-drawer-tab-select .workspace-tab-header-new-tab,
 .workspace-split.mod-left-split .workspace-tab-header-new-tab,
+.workspace-split.mod-right-split .workspace-tab-header-new-tab,
 .workspace-drawer .workspace-tab-header-new-tab {
   display: none;
 }
@@ -2998,7 +3044,9 @@ img {
 :is(.theme-light, .theme-dark) .workspace-tab-header::before,
 :is(.theme-light, .theme-dark) .workspace-tab-header::after,
 :is(.theme-light, .theme-dark) .workspace-tab-header.is-active::before,
-:is(.theme-light, .theme-dark) .workspace-tab-header.is-active::after {
+:is(.theme-light, .theme-dark) .workspace-tab-header.is-active::after,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable::before,
+:is(.theme-light, .theme-dark) .workspace-tab-header.tappable::after {
   display: none;
   content: none;
   width: 0;
@@ -3017,11 +3065,16 @@ img {
   margin-block: calc(var(--size-4-2) * 0.5);
 }
 
-/* 6. Active workspace leaf header fill color matches note content below */
+/* 6. All view headers (active, inactive, pinned, sidebars) use consistent retro window header styling */
+:is(.theme-light, .theme-dark) .view-header,
+:is(.theme-light, .theme-dark) .view-header.view-header-always-show,
+:is(.theme-light, .theme-dark) .workspace-leaf .view-header,
 :is(.theme-light, .theme-dark) .workspace-leaf.mod-active .view-header,
 :is(.theme-light, .theme-dark) .is-focused .workspace-leaf.mod-active .view-header,
 :is(.theme-light, .theme-dark).is-mobile .workspace-leaf.mod-active .view-header {
-  background-color: var(--background-primary);
+  background-color: var(--background-secondary);
+  border: var(--border-groove);
+  border-radius: var(--window-border-radius);
 }
 
 /* @settings

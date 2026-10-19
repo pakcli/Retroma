@@ -1,0 +1,22 @@
+{
+  "name": "vintage-computer-theme",
+  "version": "1.0.1",
+  "description": "Tactile retro-computing theme for Obsidian and web applications",
+  "scripts": {
+    "build": "sass --no-source-map theme.scss theme.css",
+    "build:web": "sass --no-source-map --style=compressed theme.scss arcade.css",
+    "watch": "sass --watch --no-source-map theme.scss:theme.css"
+  },
+  "devDependencies": {
+    "sass": "^1.105.2"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-theme",
+    "retro",
+    "vintage",
+    "scss"
+  ],
+  "author": "pakcli",
+  "license": "MIT"
+}
